@@ -7,6 +7,8 @@ import json
 DATABASE = "example.db"
 CSV_FILE_1 = "data/presidents-1.csv"
 CSV_FILE_2 = "data/presidents-2.csv"
+JSON_FILE_1 = "data/presidents-3.json"
+JSON_FILE_2 = "data/presidents-4.json"
 
 # If database (in case of SQLite this is a text file) doesn't exist
 if not os.path.exists(DATABASE):
@@ -51,14 +53,28 @@ try:
     with open(CSV_FILE_2) as csv_file:
         csv_reader = csv.reader(csv_file)
         # Get all rows of csv from csv_reader object as list of tuples
-        rows = list(map(tuple, csv_reader))
+        rows = [map(tuple, csv_reader)]
         cur.executemany("INSERT INTO president (first_name, last_name) VALUES (?, ?)", rows[1:]) # The [1:] prevents the header row (first row) from being inserted
+
+    # Insert data from json file (qmark style)
+    with open(JSON_FILE_1) as json_file:
+        data = json.load(json_file)
+        for row in data:
+            cur.execute("INSERT INTO president (first_name, last_name) VALUES (?, ?)", (row["first_name"], row["last_name"]))
+
+    # Insert data from json file (qmark style used with executemany())
+    with open(JSON_FILE_1) as json_file:
+        data = json.load(json_file)
+        rows = [tuple(row.values()) for row in data]
+        cur.executemany("INSERT INTO president (first_name, last_name) VALUES (?, ?)", rows)
 
     # Save changes
     con.commit()
     print("Changes saved")
+
 except sqlite3.Error as error:
     print("Error while connecting to sqlite", error)
+
 finally:
     if con:
         con.close()
