@@ -1,5 +1,7 @@
 # Python SQLite Template
 
+Learn by one example
+
 ## Documentation
 
 [Official `sqlite3` documentation](https://docs.python.org/3/library/sqlite3.html)
